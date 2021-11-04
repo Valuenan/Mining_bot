@@ -11,7 +11,7 @@
 # pyinstaller --onefile -w -i "E:\Python\Mining_bot\img\ico.ico" v_local_check.py
 
 
-V_QT = 'v0.14'
+V_QT = 'v0.2'
 
 import sys
 
@@ -69,7 +69,6 @@ class WorkerTelegram(QThread):
 
 class Ui_MainWindow(object):
     def __init__(self):
-        self.neutral_cord_y = None
         self.pull_num = 0
 
     def setupUi(self, MainWindow):
@@ -154,6 +153,14 @@ class Ui_MainWindow(object):
         self.cargo_status.setGeometry(QtCore.QRect(150, 40, 71, 16))
         self.cargo_status.setObjectName("cargo_status")
         self.cargo_status.setStyleSheet(text_style_sheet)
+        self.cloak_info = QtWidgets.QLabel(self.centralwidget)
+        self.cloak_info.setGeometry(QtCore.QRect(320, 40, 30, 16))
+        self.cloak_info.setObjectName("cloak_info")
+        self.cloak_info.setStyleSheet(text_style_sheet)
+        self.status_cloak = QtWidgets.QLabel(self.centralwidget)
+        self.status_cloak.setGeometry(QtCore.QRect(280, 40, 40, 16))
+        self.status_cloak.setObjectName("status_cloak")
+        self.status_cloak.setStyleSheet(text_style_sheet)
         self.drill_info = QtWidgets.QLabel(self.centralwidget)
         self.drill_info.setGeometry(QtCore.QRect(240, 70, 30, 16))
         self.drill_info.setObjectName("drill_info")
@@ -210,6 +217,8 @@ class Ui_MainWindow(object):
         self.first_belt.raise_()
         self.cargo_info.raise_()
         self.cargo_status.raise_()
+        self.cloak_info.raise_()
+        self.status_cloak.raise_()
         self.drill_info.raise_()
         self.drill_status.raise_()
         self.ore_info.raise_()
@@ -264,6 +273,8 @@ class Ui_MainWindow(object):
         self.first_belt.setText(_translate("MainWindow", "First belt"))
         self.cargo_info.setText(_translate("MainWindow", "None"))
         self.cargo_status.setText(_translate("MainWindow", "Cargo status"))
+        self.cloak_info.setText(_translate("MainWindow", "None"))
+        self.status_cloak.setText(_translate("MainWindow", "Cloak"))
         self.drill_info.setText(_translate("MainWindow", "None"))
         self.drill_status.setText(_translate("MainWindow", "Drill status"))
         self.ore_info.setText(_translate("MainWindow", "None"))
@@ -313,6 +324,8 @@ class Ui_MainWindow(object):
                     self.activity_view.setText(value)
                 elif name == 'status':
                     self.status_info.setText(value)
+                elif name == 'cloak':
+                    self.cloak_info.setText(str(value))
                 elif name == 'minus':
                     self.minus_info.setText(str(value))
                 elif name == 'neutral':
@@ -325,8 +338,6 @@ class Ui_MainWindow(object):
                     self.drill_info.setText(str(value))
                 elif name == 'ore':
                     self.ore_info.setText(str(value))
-                elif name == 'neutral_y':
-                    self.neutral_cord_y = value
 
     def start_worker(self):
         self.my_thread.start()

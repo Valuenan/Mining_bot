@@ -1,3 +1,5 @@
+import pyautogui
+
 STATION = 'img/station.png'
 STORAGE = 'img/station_storage.png'
 STORAGE_P = 'img/station_storage_p.png'
@@ -7,6 +9,7 @@ EMPTY_BELT = 'img/empty_belt.bmp'
 SPEED_MAX = 'img/speed_check_max.png'
 SPEED_MIN = 'img/speed_check_min.png'
 NEW_LOCAL_ZERO = 'img/zero.png'
+CLOAK_ACTIVE = 'img/cloack_active.png'
 ALL_SCREEN = (0, 0, 1830, 510)
 RIGHT_LOCAL = (1045, 200, 180, 200)
 RIGHT_LOCAL_NAME = (1045, 200, 140, 200)
@@ -33,6 +36,7 @@ OVER_SELECTOR_BELT = (1670, 430, 120, 35)
 OVER_REWARP_BELT = (1660, 140, 120, 35)
 WARP_TO_1_POSITION = (1520, 140, 120, 50)
 SPEED_CHECK = (1385, 495, 60, 40)
+STOP_ENGINE = (1275, 470, 20, 20)
 CARGO_CHECK = (953, 108, 73, 38)
 DREEL_1 = (1540, 510, 40, 40)
 DREEL_2 = (1600, 510, 40, 40)
@@ -45,12 +49,13 @@ OVER_ONLY_BELTS = (1850, 80, 35, 35)
 MINS_CHECK = (1660, 80, 15, 35)
 WARP_TO_2_POSITION = (1520, 190, 120, 50)
 CARGO_SPAN = (980, 120, 30, 10)
-CLOACK = (1830, 510, 40)
+CLOAK = (1825, 505, 30, 30)
 OVER_BUTTON = (1840, 330, 20)
 
-# if __name__ == '__main__':
-#     img = pyautogui.screenshot(region=NEW_LOCAL_RELATIONS)
-#     img.save(r"../img/new_local.png")
-#     img = cv.imread(r"../img/new_local.png")
-#     img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-#     cv.imwrite(r"../img/new_local.png", img)
+if __name__ == '__main__':
+    img = pyautogui.screenshot(region=CLOACK)
+    img.show('test')
+    img.save(r"../img/cloack_active.png")
+    # img = cv.imread(r"../img/new_local.png")
+    # img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    # cv.imwrite(r"../img/new_local.png", img)

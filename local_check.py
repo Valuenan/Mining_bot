@@ -1,4 +1,3 @@
-import pyautogui
 import time
 import random
 import pygame
@@ -7,7 +6,7 @@ from queue import Queue
 from my_scripts.coords_and_img import *
 from my_scripts import misc_func as mf
 
-V_LC = 'v0.4'
+V_LC = 'v0.42'
 pygame.mixer.init()
 SAVE_FILE = 'save.txt'
 q = Queue()
@@ -24,6 +23,7 @@ class MainLocalCheck:
         self.minus = False
         self.neutral = False
         self.drill_status = False
+        self.cloak_status = False
         self.status = ''
         self.cargo = 'empty'
         self.ore = 0
@@ -51,7 +51,8 @@ class MainLocalCheck:
 
             self.info({'info': f''''time = {time.ctime()}
                             ore = {self.ore}, status = {self.status}, cargo = {self.cargo}, 
-                            first belt status = {self.status_belt_1}, minus = {self.minus}, neutal = {self.neutral}'''})
+                            first belt status = {self.status_belt_1}, minus = {self.minus}, neutal = {self.neutral}
+                            cloak = {self.cloak_status}'''})
         else:
             if self.ore < 1000000:
                 calc = str(round(self.ore // 1000))
@@ -60,6 +61,7 @@ class MainLocalCheck:
                 calc = str(round(self.ore / 1000000, 2))
                 ore = (f'{calc} kk')
             self.info({'status': self.status})
+            self.info({'cloak': self.cloak_status})
             self.info({'minus': self.minus})
             self.info({'neutral': self.neutral})
             self.info({'first_belt': self.status_belt_1})
@@ -74,7 +76,7 @@ class MainLocalCheck:
     def data_save(self):
         data = {'time_start': self.time_start, 'time_stop': self.time_stop, 'ore': self.ore, 'status': self.status,
                 'cargo': self.cargo, 'first_belt_status': self.status_belt_1, 'minus': self.minus,
-                'neutal': self.neutral, 'dreel_status': self.drill_status}
+                'neutal': self.neutral, 'dreel_status': self.drill_status, 'cloak': self.cloak_status}
         with open('save.txt', encoding='utf-8', mode='w') as save:
             for key, value in data.items():
                 save.write(f'{key} {value} ')
@@ -125,10 +127,11 @@ class MainLocalCheck:
         self.info({'drill_status': self.drill_status})
         self.time_start = time.time()
         self.data_save()
+        mf.click_queue([OVER_STATION, GO_DOCK])
         mf.click_queue([DREEL_1, DREEL_2, DREEL_3])
 
     def neutral_minus_check(self):
-        if self.status == 'warp_to_dock':
+        if self.status == 'warp_to_dock' and not self.cloak_status:
             return
         if pyautogui.locateOnScreen(NEW_LOCAL_ZERO, region=NEW_LOCAL_RELATIONS_MINUS, confidence=0.75,
                                     grayscale=True) is None:
@@ -144,7 +147,6 @@ class MainLocalCheck:
             return
         else:
             self.neutral = False
-
 
     def start_check(self):
         self.data_load()
@@ -167,6 +169,7 @@ class MainLocalCheck:
             self.time_stop = time.time()
             self.drill_status = False
             self.info({'drill_status': self.drill_status})
+            self.cloaking()
             self.status = 'warp_to_dock'
             pygame.mixer.music.load("audio/Минус.mp3")
             pygame.mixer.music.play()
@@ -181,14 +184,34 @@ class MainLocalCheck:
                  CLOSE_WINDOW])
             self.cargo = 'empty'
 
+    def cloaking(self):
+        mf.click_queue([CLOAK])
+        if self.cloak_status:
+            self.cloak_status = False
+        else:
+            self.cloak_status = True
+
     '''
     logic block
     '''
 
     def in_station(self):
+        if self.cloak_status:
+            if pyautogui.locateOnScreen(CLOAK_ACTIVE, region=CLOAK, confidence=0.8) is not None:
+                mf.click_queue([STOP_ENGINE, OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_STATION, GO_DOCK]) #OVER_STATION - first belt, GO_DOCK - aproach
+                while self.minus or self.neutral:
+                    self.neutral_minus_check()
+                    self.inforamtion_text()
+                if self.status != 'dock':
+                    self.cloaking()
+                    self.status = 'warp_to_mine'
+            else:
+                self.status = 'warp_to_dock'
+
         if pyautogui.locateOnScreen(STATION, region=STATION_SCREEN, confidence=0.8) is not None:
             time.sleep(4)
             self.status = 'dock'
+            self.cloak_status = False
             self.over = False
             time.sleep(5)
             if self.cargo == 'fool':
@@ -211,14 +234,12 @@ class MainLocalCheck:
                 self.neutral_minus_check()
                 self.inforamtion_text()
             if self.cargo == 'empty':
-                x, y = mf.rand_cords(UNDOCK)
-                mf.click(x, y)
-                time.sleep(random.randint(10, 15))
+                mf.click_queue([UNDOCK])
+                time.sleep(18)
                 self.status = 'idle'
                 self.neutral_minus_check()
                 if self.minus or self.neutral:
                     self.to_dock()
-
 
     def in_space_check(self):
         self.neutral_minus_check()
@@ -261,7 +282,7 @@ class MainLocalCheck:
 
                 self.data_save()
 
-        if self.status == 'idle' and not self.minus:
+        if self.status == 'idle' and not self.minus and not self.neutral:
             self.neutral_minus_check()
             self.status = 'warp_to_mine'
             if not self.over:
@@ -272,9 +293,9 @@ class MainLocalCheck:
             else:
                 queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_REWARP_BELT, WARP_TO_2_POSITION]
             mf.click_queue(queue)
+            time.sleep(60)
 
         if self.status == 'warp_to_mine':
-            time.sleep(random.randint(60, 61))
             self.neutral_minus_check()
             if self.minus or self.neutral:
                 self.to_dock()
@@ -318,9 +339,8 @@ class pocess(Thread):
         while True:
             try:
                 self.check.local_check()
-            except OSError as err:
-                print(f'sistem restart... : {err}')
-                self.run()
+            except Exception as err:
+                print({err})
 
 
 if __name__ == '__main__':

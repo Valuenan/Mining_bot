@@ -36,6 +36,7 @@ def output_data(message):
             data['minus'] = info[13]
             data['neutral'] = info[15]
             data['drill_status'] = info[17]
+            data['cloak'] = info[19]
             # else:
             #     bot.send_message(message.chat.id, "Записей нет")
 
