@@ -7,7 +7,7 @@ from queue import Queue
 from my_scripts.coords_and_img import *
 from my_scripts import misc_func as mf
 
-V_LC = 'v0.41'
+V_LC = 'v0.5'
 pygame.mixer.init()
 SAVE_FILE = 'save.txt'
 q = Queue()

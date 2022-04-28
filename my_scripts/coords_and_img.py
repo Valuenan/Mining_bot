@@ -15,7 +15,7 @@ RIGHT_LOCAL = (1045, 200, 180, 200)
 RIGHT_LOCAL_NAME = (1045, 200, 140, 200)
 RIGHT_LOCAL_RELATION = (1195, 200, 30, 200)
 NEW_LOCAL_RELATIONS = (1045, 400, 160, 40)
-NEW_LOCAL_RELATIONS_MINUS = (1045, 400, 40, 40)
+NEW_LOCAL_RELATIONS_MINUS = (1100, 400, 40, 40)
 NEW_LOCAL_RELATIONS_NEUTRAL = (1165, 400, 40, 40)
 RIGHT_PART_SCREEN = (915, 0, 990, 600)
 MY_OVER = (1840, 330, 20, 20)
@@ -54,6 +54,6 @@ OVER_BUTTON = (1840, 330, 20)
 if __name__ == '__main__':
     import pyautogui
 
-    img = pyautogui.screenshot(region=TWO_MINERS_SCREEN)
+    img = pyautogui.screenshot(region=NEW_LOCAL_RELATIONS_MINUS)
     img.show('test')
 
