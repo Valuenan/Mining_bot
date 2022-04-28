@@ -118,13 +118,21 @@ class MainLocalCheck:
     actions block
     '''
 
+    def warp_check(self):
+        time.sleep(15)
+        while True:
+            mf.click_queue([DREEL_1])
+            if pyautogui.locateOnScreen(WARP_CHECK, region=TWO_MINERS_SCREEN, confidence=0.7) is None:
+                break
+            time.sleep(random.randint(1, 2))
+
     def drill_on(self):
         self.status = 'mine'
         self.drill_status = True
         self.info({'drill_status': self.drill_status})
         self.time_start = time.time()
         self.data_save()
-        mf.click_queue([DREEL_1, DREEL_2, DREEL_3])
+        mf.click_queue([DREEL_2, DREEL_3])
 
     def neutral_minus_check(self):
         if self.status == 'warp_to_dock':
@@ -213,7 +221,7 @@ class MainLocalCheck:
                 self.information_text()
             if self.cargo == 'empty':
                 mf.click_queue([UNDOCK])
-                time.sleep(random.randint(18, 20))
+                time.sleep(random.randint(16, 18))
                 self.status = 'idle'
                 self.neutral_minus_check()
                 if self.minus or self.neutral:
@@ -221,13 +229,13 @@ class MainLocalCheck:
 
     def in_space_check(self):
         self.neutral_minus_check()
-        if self.status != 'warp_to_dock':
-            if self.minus or self.neutral:
-                self.to_dock()
-                self.cargo = 'fool'
-                self.data_save()
+        if self.minus or self.neutral:
+            self.cargo = 'fool'
+            self.to_dock()
+            self.data_save()
 
-            if pyautogui.locateOnScreen(FOOL_CARGO_WORDS, region=ALL_SCREEN, confidence=0.7) is not None:
+        if self.status != 'warp_to_dock':
+            if pyautogui.locateOnScreen(FOOL_CARGO_WORDS, region=TWO_MINERS_SCREEN, confidence=0.7) is not None:
                 self.time_stop = time.time()
                 self.drill_status = False
                 self.info({'drill_status': self.drill_status})
@@ -238,7 +246,7 @@ class MainLocalCheck:
                 mf.click_queue([OVER_SELECTOR, OVER_SELECTOR_STATION, OVER_STATION, GO_DOCK, INTERA_1, INTERA_2])
                 self.data_save()
 
-            if pyautogui.locateOnScreen(EMPTY_BELT, region=ALL_SCREEN, confidence=0.7) is not None:
+            if pyautogui.locateOnScreen(EMPTY_BELT, region=TWO_MINERS_SCREEN, confidence=0.7) is not None:
                 self.time_stop = time.time()
                 self.drill_status = False
                 self.info({'drill_status': self.drill_status})
@@ -254,7 +262,7 @@ class MainLocalCheck:
                 pygame.mixer.music.load("audio/Нет_минералов.mp3")
                 pygame.mixer.music.play()
                 mf.click_queue([OVER_REWARP_BELT, WARP_TO_2_POSITION])
-                time.sleep(random.randint(60, 61))
+                self.warp_check()
                 self.drill_on()
                 self.info({'status': self.status})
 
@@ -273,12 +281,12 @@ class MainLocalCheck:
             mf.click_queue(queue)
 
         if self.status == 'warp_to_mine':
-            time.sleep(random.randint(60, 61))
+            self.warp_check()
             self.neutral_minus_check()
             if self.minus or self.neutral:
                 self.to_dock()
-                self.data_save()
-            self.drill_on()
+            else:
+                self.drill_on()
             self.data_save()
 
     '''

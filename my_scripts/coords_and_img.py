@@ -7,7 +7,9 @@ EMPTY_BELT = 'img/empty_belt.bmp'
 SPEED_MAX = 'img/speed_check_max.png'
 SPEED_MIN = 'img/speed_check_min.png'
 NEW_LOCAL_ZERO = 'img/zero.png'
+WARP_CHECK = 'img/warp_check.png'
 ALL_SCREEN = (0, 0, 1830, 510)
+TWO_MINERS_SCREEN = (0, 0, 1830, 600)
 LOCAL_BUTTON = (950, 465, 60, 20)
 RIGHT_LOCAL = (1045, 200, 180, 200)
 RIGHT_LOCAL_NAME = (1045, 200, 140, 200)
@@ -52,5 +54,6 @@ OVER_BUTTON = (1840, 330, 20)
 if __name__ == '__main__':
     import pyautogui
 
-    img = pyautogui.screenshot(region=LOCAL_BUTTON)
+    img = pyautogui.screenshot(region=TWO_MINERS_SCREEN)
     img.show('test')
+
