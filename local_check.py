@@ -275,9 +275,10 @@ class MainLocalCheck:
                 self.over = True
                 mf.click_queue([OVER_BUTTON])
             if self.status_belt_1:
-                queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_STATION, WARP_TO_1_POSITION]
+                belt = [OVER_STATION, WARP_TO_1_POSITION]
             else:
-                queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_REWARP_BELT, WARP_TO_2_POSITION]
+                belt = [OVER_REWARP_BELT, WARP_TO_2_POSITION]
+            queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, belt[0], belt[1], INTERA_2]
             mf.click_queue(queue)
 
         if self.status == 'warp_to_mine':
