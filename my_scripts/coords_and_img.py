@@ -55,6 +55,6 @@ OVER_BUTTON = (1840, 330, 20)
 if __name__ == '__main__':
     import pyautogui
 
-    img = pyautogui.screenshot(region=VUE)
+    img = pyautogui.screenshot(region=WARP_TO_1_POSITION)
     img.show('test')
 

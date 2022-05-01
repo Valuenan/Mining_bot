@@ -7,7 +7,7 @@ from queue import Queue
 from my_scripts.coords_and_img import *
 from my_scripts import misc_func as mf
 
-V_LC = 'v0.51'
+V_LC = 'v0.51b'
 pygame.mixer.init()
 SAVE_FILE = 'save.txt'
 q = Queue()
@@ -169,7 +169,7 @@ class MainLocalCheck:
             if not self.over:
                 self.over = True
                 mf.click_queue([OVER_BUTTON, VUE])
-                mf.click_queue([OVER_STATION, GO_DOCK])
+                mf.click_queue([OVER_STATION, WARP_TO_1_POSITION])
                 self.status = 'dock'
         else:
             self.time_stop = time.time()
@@ -275,10 +275,9 @@ class MainLocalCheck:
                 self.over = True
                 mf.click_queue([OVER_BUTTON])
             if self.status_belt_1:
-                belt = WARP_TO_1_POSITION
+                queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_STATION, WARP_TO_1_POSITION]
             else:
-                belt = WARP_TO_2_POSITION
-            queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_REWARP_BELT, belt, INTERA_2, VUE]
+                queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_REWARP_BELT, WARP_TO_2_POSITION]
             mf.click_queue(queue)
 
         if self.status == 'warp_to_mine':
