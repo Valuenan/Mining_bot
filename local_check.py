@@ -7,7 +7,7 @@ from queue import Queue
 from my_scripts.coords_and_img import *
 from my_scripts import misc_func as mf
 
-V_LC = 'v0.5'
+V_LC = 'v0.51'
 pygame.mixer.init()
 SAVE_FILE = 'save.txt'
 q = Queue()
@@ -121,7 +121,7 @@ class MainLocalCheck:
     def warp_check(self):
         time.sleep(15)
         while True:
-            mf.click_queue([DREEL_1])
+            mf.click_queue([WARP_CHECK_DRONE])
             if pyautogui.locateOnScreen(WARP_CHECK, region=TWO_MINERS_SCREEN, confidence=0.7) is None:
                 break
             time.sleep(random.randint(1, 2))
@@ -132,7 +132,7 @@ class MainLocalCheck:
         self.info({'drill_status': self.drill_status})
         self.time_start = time.time()
         self.data_save()
-        mf.click_queue([DREEL_2, DREEL_3])
+        mf.click_queue([DREEL_1, DREEL_2, DREEL_3])
 
     def neutral_minus_check(self):
         if self.status == 'warp_to_dock':
@@ -273,11 +273,12 @@ class MainLocalCheck:
             self.status = 'warp_to_mine'
             if not self.over:
                 self.over = True
-                mf.click_queue([OVER_BUTTON, VUE])
+                mf.click_queue([OVER_BUTTON])
             if self.status_belt_1:
-                queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_STATION, WARP_TO_1_POSITION]
+                belt = WARP_TO_1_POSITION
             else:
-                queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_REWARP_BELT, WARP_TO_2_POSITION]
+                belt = WARP_TO_2_POSITION
+            queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, OVER_REWARP_BELT, belt, INTERA_2, VUE]
             mf.click_queue(queue)
 
         if self.status == 'warp_to_mine':
