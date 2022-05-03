@@ -7,7 +7,7 @@ from queue import Queue
 from my_scripts.coords_and_img import *
 from my_scripts import misc_func as mf
 
-V_LC = 'v0.51b'
+V_LC = 'v0.51c'
 pygame.mixer.init()
 SAVE_FILE = 'save.txt'
 q = Queue()
@@ -118,21 +118,13 @@ class MainLocalCheck:
     actions block
     '''
 
-    def warp_check(self):
-        time.sleep(15)
-        while True:
-            mf.click_queue([WARP_CHECK_DRONE])
-            if pyautogui.locateOnScreen(WARP_CHECK, region=TWO_MINERS_SCREEN, confidence=0.7) is None:
-                break
-            time.sleep(random.randint(1, 2))
-
     def drill_on(self):
         self.status = 'mine'
         self.drill_status = True
         self.info({'drill_status': self.drill_status})
         self.time_start = time.time()
         self.data_save()
-        mf.click_queue([DREEL_1, DREEL_2, DREEL_3])
+        mf.click_queue([DREEL_1, DREEL_2, DREEL_3], 0.5)
 
     def neutral_minus_check(self):
         if self.status == 'warp_to_dock':
@@ -168,8 +160,7 @@ class MainLocalCheck:
         if self.status == 'idle':
             if not self.over:
                 self.over = True
-                mf.click_queue([OVER_BUTTON, VUE])
-                mf.click_queue([OVER_STATION, WARP_TO_1_POSITION])
+                mf.click_queue([OVER_BUTTON, OVER_STATION, WARP_TO_1_POSITION])
                 self.status = 'dock'
         else:
             self.time_stop = time.time()
@@ -180,10 +171,23 @@ class MainLocalCheck:
             pygame.mixer.music.play()
             mf.click_queue([OVER_SELECTOR, OVER_SELECTOR_STATION, OVER_STATION, GO_DOCK, INTERA_1, INTERA_2])
 
+    def extraction_info(self):
+        time_ = round(self.time_stop - self.time_start)
+        ore_mined = 3 * (time_ * 29.53 + time_ * 30.59)
+        self.ore += ore_mined
+        if self.ore < 1000000:
+            calc = str(round(self.ore // 1000))
+            ore = f'{calc} k'
+        else:
+            calc = str(round(self.ore / 1000000, 2))
+            ore = f'{calc} kk'
+        self.info({'ore': ore})
+        self.info({'info': f'Now mined {round(ore_mined, 2)} ore'})
+
     def extraction(self):
         if self.cargo == 'fool' and self.status == 'dock':
             mf.click_queue([CARGO_SPAN])
-            time.sleep(random.randint(5, 7))
+            time.sleep(random.randint(4, 5))
             mf.click_queue(
                 [MY_STORAGE_CLOSE, STATION_STORAGE_ORE, SELECT_ALL, MOVE_CARGO_TO, MOVE_TO_STATION,
                  CLOSE_WINDOW])
@@ -195,22 +199,11 @@ class MainLocalCheck:
 
     def in_station(self):
         if pyautogui.locateOnScreen(STATION, region=STATION_SCREEN, confidence=0.8) is not None:
-            time.sleep(4)
             self.status = 'dock'
             self.over = False
-            time.sleep(5)
+            time.sleep(6)
             if self.cargo == 'fool':
-                time_ = round(self.time_stop - self.time_start)
-                ore_mined = 3 * (time_ * 29.53 + time_ * 30.59)
-                self.ore += ore_mined
-                if self.ore < 1000000:
-                    calc = str(round(self.ore // 1000))
-                    ore = f'{calc} k'
-                else:
-                    calc = str(round(self.ore / 1000000, 2))
-                    ore = f'{calc} kk'
-                self.info({'ore': ore})
-                self.info({'info': f'Now mined {round(ore_mined, 2)} ore'})
+                self.extraction_info()
                 self.extraction()
                 self.data_save()
             self.neutral_minus_check()
@@ -262,7 +255,7 @@ class MainLocalCheck:
                 pygame.mixer.music.load("audio/Нет_минералов.mp3")
                 pygame.mixer.music.play()
                 mf.click_queue([OVER_REWARP_BELT, WARP_TO_2_POSITION])
-                self.warp_check()
+                mf.warp_check()
                 self.drill_on()
                 self.info({'status': self.status})
 
@@ -278,11 +271,10 @@ class MainLocalCheck:
                 belt = [OVER_STATION, WARP_TO_1_POSITION]
             else:
                 belt = [OVER_REWARP_BELT, WARP_TO_2_POSITION]
-            queue = [OVER_SELECTOR, OVER_SELECTOR_BELT, belt[0], belt[1], INTERA_2]
-            mf.click_queue(queue)
+            mf.click_queue([OVER_SELECTOR, OVER_SELECTOR_BELT, belt[0], belt[1], INTERA_2, VIEW])
 
         if self.status == 'warp_to_mine':
-            self.warp_check()
+            mf.warp_check()
             self.neutral_minus_check()
             if self.minus or self.neutral:
                 self.to_dock()

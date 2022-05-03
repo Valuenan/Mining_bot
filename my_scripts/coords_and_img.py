@@ -40,11 +40,12 @@ CARGO_CHECK = (953, 108, 73, 38)
 DREEL_1 = (1540, 510, 40, 40)
 DREEL_2 = (1600, 510, 40, 40)
 DREEL_3 = (1660, 510, 40, 40)
-WARP_CHECK_DRONE = (1640, 440, 40, 40)
+WARP_CHECK_DRONE = (1645, 445, 30, 30)
+DRONE_2 = (1705, 445, 30, 30)
 INTERA_1 = (1720, 510, 40, 40)
 INTERA_2 = (1780, 510, 40, 40)
 CLOSE_WINDOW = (1839, 63, 20, 20)
-VUE = (1400, 480, 30, 30)
+VIEW = (1400, 480, 30, 30)
 OVER_ONLY_BELTS = (1850, 80, 35, 35)
 MINS_CHECK = (1660, 80, 15, 35)
 WARP_TO_2_POSITION = (1520, 190, 120, 50)
@@ -55,6 +56,6 @@ OVER_BUTTON = (1840, 330, 20)
 if __name__ == '__main__':
     import pyautogui
 
-    img = pyautogui.screenshot(region=WARP_TO_1_POSITION)
+    img = pyautogui.screenshot(region=DRONE_2)
     img.show('test')
 

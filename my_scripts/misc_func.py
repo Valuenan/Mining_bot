@@ -15,11 +15,21 @@ def rand_cords(cords):
     return point_x, point_y
 
 
-def click_queue(queue_list):
+def click_queue(queue_list, sleep=1):
     for cords in queue_list:
         x, y = rand_cords(cords)
         pyautogui.leftClick(x, y)
-        time.sleep(2)
+        time.sleep(sleep)
+
+
+def warp_check():
+    time.sleep(15)
+    while True:
+        click_queue([ci.WARP_CHECK_DRONE], 2)
+        if pyautogui.locateOnScreen(ci.WARP_CHECK, region=ci.TWO_MINERS_SCREEN, confidence=0.7) is None:
+            break
+        time.sleep(random.randint(1, 2))
+    click_queue([ci.DRONE_2])
 
 
 def screen_shot():
