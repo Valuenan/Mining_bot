@@ -23,7 +23,7 @@ def click_queue(queue_list, sleep=1):
 
 
 def warp_check():
-    time.sleep(15)
+    time.sleep(25)
     while True:
         click_queue([ci.WARP_CHECK_DRONE], 2)
         if pyautogui.locateOnScreen(ci.WARP_CHECK, region=ci.TWO_MINERS_SCREEN, confidence=0.7) is None:

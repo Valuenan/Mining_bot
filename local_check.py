@@ -18,6 +18,7 @@ class MainLocalCheck:
     def __init__(self, save_file, starter, threads, queue=None):
         self.save_file = save_file
         self.starter = starter
+        self.mining_mod = 'solo'
         self.over = False
         self.status_belt_1 = True
         self.minus = False
@@ -31,6 +32,7 @@ class MainLocalCheck:
         self.threads = threads
         self.queue = queue
         self.pull_num = 1
+        self.ignore_alarm = False
 
     '''
     information block
@@ -78,7 +80,17 @@ class MainLocalCheck:
             for key, value in data.items():
                 save.write(f'{key} {value} ')
 
+    def settings_load(self):
+        try:
+            with open('settings.txt', encoding='utf-8', mode='r') as settings:
+                data = settings.read().split(' ')
+                self.mining_mod = data[1]
+        except FileNotFoundError:
+            with open('settings.txt', encoding='utf-8', mode='x') as settings:
+                settings.write(f'mining_mod solo')
+
     def data_load(self):
+
         ore_mined = None
         try:
             with open('save.txt', encoding='utf-8', mode='r') as save:
@@ -135,8 +147,6 @@ class MainLocalCheck:
             self.info({'minus': self.minus})
             self.data_save()
             return
-        else:
-            self.minus = False
         if pyautogui.locateOnScreen(NEW_LOCAL_ZERO, region=NEW_LOCAL_RELATIONS_NEUTRAL, confidence=0.75,
                                     grayscale=True) is None:
             self.neutral = True
@@ -144,9 +154,13 @@ class MainLocalCheck:
             self.data_save()
             return
         else:
+            self.minus = False
             self.neutral = False
+            self.ignore_alarm = False
+            self.data_save()
 
     def start_check(self):
+        self.settings_load()
         self.data_load()
         if pyautogui.locateOnScreen(STATION, region=STATION_SCREEN, confidence=0.7) is not None:
             self.status = 'dock'
@@ -162,7 +176,7 @@ class MainLocalCheck:
                 self.over = True
                 mf.click_queue([OVER_BUTTON, OVER_STATION, WARP_TO_1_POSITION])
                 self.status = 'dock'
-        else:
+        elif self.mining_mod == 'solo':
             self.time_stop = time.time()
             self.drill_status = False
             self.info({'drill_status': self.drill_status})
@@ -170,6 +184,10 @@ class MainLocalCheck:
             pygame.mixer.music.load("audio/Минус.mp3")
             pygame.mixer.music.play()
             mf.click_queue([OVER_SELECTOR, OVER_SELECTOR_STATION, OVER_STATION, GO_DOCK, INTERA_1, INTERA_2])
+        elif not self.ignore_alarm:
+            pygame.mixer.music.load("audio/Минус.mp3")
+            pygame.mixer.music.play()
+            self.ignore_alarm = True
 
     def extraction_info(self):
         time_ = round(self.time_stop - self.time_start)
@@ -199,6 +217,7 @@ class MainLocalCheck:
 
     def in_station(self):
         if pyautogui.locateOnScreen(STATION, region=STATION_SCREEN, confidence=0.8) is not None:
+            self.settings_load()
             self.status = 'dock'
             self.over = False
             time.sleep(6)
@@ -210,7 +229,6 @@ class MainLocalCheck:
             while self.neutral or self.minus:
                 time.sleep(3)
                 self.neutral_minus_check()
-                self.data_save()
                 self.information_text()
             if self.cargo == 'empty':
                 mf.click_queue([UNDOCK])
@@ -227,7 +245,7 @@ class MainLocalCheck:
             self.to_dock()
             self.data_save()
 
-        if self.status != 'warp_to_dock':
+        if self.status != 'warp_to_mine' or self.status != 'mine':
             if pyautogui.locateOnScreen(FOOL_CARGO_WORDS, region=TWO_MINERS_SCREEN, confidence=0.7) is not None:
                 self.time_stop = time.time()
                 self.drill_status = False
@@ -246,12 +264,20 @@ class MainLocalCheck:
                 time_ = round(self.time_stop - self.time_start)
                 ore_mined = 3 * (time_ * 21.91 + time_ * 26.415)
                 self.ore += ore_mined
-                if not self.status_belt_1:
+                if self.mining_mod == 'rorqual':
+                    mf.click_queue([FLEET_MENU, FLEET_COM])
+                    if pyautogui.locateOnScreen(FC_CHECK, region=WARP_TO_FLEET_COM, confidence=0.8) is None:
+                        mf.click_queue([WARP_TO_FLEET_COM, RIGHT_LOCAL, INTERA_2])
+                    else:
+                        mf.click_queue([RIGHT_LOCAL])
+                elif not self.status_belt_1:
                     self.status_belt_1 = True
                     self.info({'first_belt': self.status_belt_1})
                 else:
                     self.status_belt_1 = False
                     self.info({'first_belt': self.status_belt_1})
+
+
                 pygame.mixer.music.load("audio/Нет_минералов.mp3")
                 pygame.mixer.music.play()
                 mf.click_queue([OVER_REWARP_BELT, WARP_TO_2_POSITION])
@@ -261,19 +287,20 @@ class MainLocalCheck:
 
                 self.data_save()
 
-        if self.status == 'idle' and not self.minus:
+        if self.status == 'idle' and not self.minus and not self.neutral:
             self.neutral_minus_check()
             self.status = 'warp_to_mine'
             if not self.over:
                 self.over = True
                 mf.click_queue([OVER_BUTTON])
-            if self.status_belt_1:
-                belt = [OVER_STATION, WARP_TO_1_POSITION]
-            else:
-                belt = [OVER_REWARP_BELT, WARP_TO_2_POSITION]
-            mf.click_queue([OVER_SELECTOR, OVER_SELECTOR_BELT, belt[0], belt[1], INTERA_2, VIEW])
-
-        if self.status == 'warp_to_mine':
+            if self.mining_mod == 'solo':
+                if self.status_belt_1:
+                    belt = [OVER_STATION, WARP_TO_1_POSITION]
+                else:
+                    belt = [OVER_REWARP_BELT, WARP_TO_2_POSITION]
+                mf.click_queue([OVER_SELECTOR, OVER_SELECTOR_BELT, belt[0], belt[1], INTERA_2, VIEW])
+            elif self.mining_mod == 'rorqual':
+                mf.click_queue([FLEET_MENU, FLEET_COM, WARP_TO_FLEET_COM, RIGHT_LOCAL, INTERA_2, VIEW])
             mf.warp_check()
             self.neutral_minus_check()
             if self.minus or self.neutral:

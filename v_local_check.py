@@ -278,24 +278,19 @@ class Ui_MainWindow(object):
         img.save(r'img/target_img.png')
         img_cv = cv.imread(r'img/target_img.png')
         if add_greed:
-            x, y, w, h = ci.RIGHT_PART_SCREEN
-            x_r, y_r, w_r, h_r = ci.NEW_LOCAL_RELATIONS
-            x_m, y_m, w_m, h_m = ci.NEW_LOCAL_RELATIONS_MINUS
-            x_n, y_n, w_n, h_n = ci.NEW_LOCAL_RELATIONS_NEUTRAL
-            x_cor_r = x_r - x
-            y_cor_r = y_r - y
-            relation_cv = cv.rectangle(img_cv, (x_cor_r, y_cor_r), (x_cor_r + w_r, y_cor_r + h_r), (0, 0, 255),
-                                       thickness=1)
-            x_cor_m = x_m - x
-            y_cor_m = y_m - y
-            minus_cv = cv.rectangle(relation_cv, (x_cor_m, y_cor_m), (x_cor_m + w_m, y_cor_m + h_m), (0, 255, 0),
-                                    thickness=1)
-            x_cor_n = x_n - x
-            y_cor_n = y_n - y
-            neutral_cv = cv.rectangle(minus_cv, (x_cor_n, y_cor_n), (x_cor_n + w_n, y_cor_n + h_n), (0, 255, 0),
+            x, y, _, _ = ci.RIGHT_PART_SCREEN
+            locations = [ci.NEW_LOCAL_RELATIONS_MINUS, ci.NEW_LOCAL_RELATIONS_NEUTRAL, ci.INTERA_1, ci.INTERA_2,
+                         ci.WARP_CHECK_DRONE, ci.DRONE_2, ci.DREEL_1, ci.DREEL_2, ci.DREEL_3, ci.OVER_BUTTON]
+
+            for item in locations:
+                x_point, y_point, wdith, height = item
+                x_coord = x_point - x
+                y_coord = y_point - y
+                img_cv = cv.rectangle(img_cv, (x_coord, y_coord), (x_coord + wdith, y_coord + height), (0, 255, 0),
                                       thickness=1)
-            main_window = cv.rectangle(neutral_cv, (27, 0), (967, 570), (0, 255, 0), thickness=1)
-            cv.imshow('img', main_window)
+
+            img_cv = cv.rectangle(img_cv, (27, 0), (967, 570), (0, 255, 0), thickness=1)
+            cv.imshow('img', img_cv)
             cv.waitKey(0)
 
     def read_data(self):
