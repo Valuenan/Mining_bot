@@ -7,7 +7,7 @@ from queue import Queue
 from my_scripts.coords_and_img import *
 from my_scripts import misc_func as mf
 
-V_LC = 'v0.51c'
+V_LC = 'v0.61'
 pygame.mixer.init()
 SAVE_FILE = 'save.txt'
 q = Queue()
@@ -269,11 +269,12 @@ class MainLocalCheck:
                     if pyautogui.locateOnScreen(FC_CHECK, region=WARP_TO_FLEET_COM, confidence=0.8) is None:
                         mf.click_queue([WARP_TO_FLEET_COM, RIGHT_LOCAL, INTERA_2])
                     else:
-                        mf.click_queue([RIGHT_LOCAL])
-                elif not self.status_belt_1:
+                        mf.click_queue([RIGHT_LOCAL, RIGHT_LOCAL])
+                        time.sleep(10)
+                elif not self.status_belt_1 and self.mining_mod == 'solo':
                     self.status_belt_1 = True
                     self.info({'first_belt': self.status_belt_1})
-                else:
+                elif self.mining_mod == 'solo':
                     self.status_belt_1 = False
                     self.info({'first_belt': self.status_belt_1})
 
